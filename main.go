@@ -20,6 +20,11 @@ func main() {
 		},
 	}))
 
+	app.Static("/document", "Z:\\Data\\Document", fiber.Static{
+		Compress:  false, // default: false
+		ByteRange: false, // default: false
+	})
+
 	app.Static("/", "./public", fiber.Static{
 		Compress:  true, // default: false
 		ByteRange: true, // default: false
