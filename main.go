@@ -10,9 +10,9 @@ import (
 func main() {
 	app := fiber.New()
 
-	app.Use("/beisApi", proxy.Balancer(proxy.Config{
+	app.Use("/pxapi_ect", proxy.Balancer(proxy.Config{
 		Servers: []string{
-			"http://10.5.46.116:8002",
+			"http://172.17.8.88:8080",
 		},
 		ModifyRequest: func(c *fiber.Ctx) error {
 			c.Set("X-Real-IP", c.IP())
@@ -20,7 +20,7 @@ func main() {
 		},
 	}))
 
-	app.Static("/document", "Z:\\Data\\Document", fiber.Static{
+	app.Static("/document", "D:\\dbPraxticol\\Data\\Document", fiber.Static{
 		Compress:  false, // default: false
 		ByteRange: false, // default: false
 	})
@@ -34,6 +34,6 @@ func main() {
 		return ctx.SendFile("./public/index.html")
 	})
 
-	log.Fatal(app.Listen(":3000"))
+	log.Fatal(app.Listen(":80"))
 
 }
