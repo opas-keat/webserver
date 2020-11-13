@@ -65,6 +65,6 @@ func main() {
 		return ctx.SendFile("./public/index.html")
 	})
 
-	log.Fatal(app.Listen(":80"))
+	log.Fatal(app.Listen(":3000"))
 
 }
