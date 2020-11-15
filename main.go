@@ -7,15 +7,28 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/compress"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/fiber/v2/middleware/proxy"
 	"github.com/gofiber/helmet/v2"
 )
 
 func main() {
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		Prefork:      true,
+		ServerHeader: "Fiber",
+	})
 
 	app.Use(helmet.New())
-	// app.Use(csrf.New())
+	app.Use(cors.New())
+
+	app.Get("/dashboard", monitor.New())
+
+	// Or extend your config for customization
+	// app.Use(limiter.New(limiter.Config{
+	// 	Max:        500,
+	// 	Expiration: time.Second,
+	// }))
 
 	// Provide a custom compression level
 	app.Use(compress.New(compress.Config{
@@ -30,10 +43,10 @@ func main() {
 
 	app.Use("/pxapi_ect", proxy.Balancer(proxy.Config{
 		Servers: []string{
-			"http://172.17.8.88:8080",
-			"http://172.17.8.88:8081",
-			"http://172.17.8.88:8082",
-			"http://172.17.8.88:8083",
+			"http://127.0.0.1:8080",
+			"http://127.0.0.1:8081",
+			"http://127.0.0.1:8082",
+			// "http://127.0.0.1:8083",
 		},
 		ModifyRequest: func(c *fiber.Ctx) error {
 			c.Set("X-Real-IP", c.IP())
