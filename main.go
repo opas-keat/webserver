@@ -37,6 +37,9 @@ func main() {
 
 	// Or extend your config for customization
 	app.Use(cache.New(cache.Config{
+		Next: func(c *fiber.Ctx) bool {
+			return c.Query("refresh") == "true"
+		},
 		Expiration:   30 * time.Minute,
 		CacheControl: true,
 	}))
@@ -64,14 +67,19 @@ func main() {
 		},
 	}))
 
-	app.Static("/document", "D:\\dbPraxticol\\Data\\Document", fiber.Static{
-		Compress:  false, // default: false
-		ByteRange: false, // default: false
-	})
+	app.Use("/document", proxy.Balancer(proxy.Config{
+		Servers: []string{
+			"http://127.0.0.1:8080",
+		},
+		ModifyRequest: func(c *fiber.Ctx) error {
+			c.Set("X-Real-IP", c.IP())
+			return c.Redirect(c.OriginalURL())
+		},
+	}))
 
 	app.Static("/", "./public", fiber.Static{
-		Compress:  true, // default: false
-		ByteRange: true, // default: false
+		Compress:  false, // default: false
+		ByteRange: false, // default: false
 	})
 
 	app.Get("/*", func(ctx *fiber.Ctx) error {
